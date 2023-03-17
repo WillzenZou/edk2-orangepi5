@@ -36,6 +36,11 @@ Build UEFI (ROCK 5B for example):
 ./build.sh -d rock-5b
 ```
 
+Build for OPi5
+```bash
+./build.sh -d orangepi-5
+```
+
 ## TODO
  - Create gpt image in build process instead of using the prebuilt one
  - Fix resetting to maskrom

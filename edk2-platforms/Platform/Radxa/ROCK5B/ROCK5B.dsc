@@ -39,6 +39,7 @@
   DEFINE NETWORK_VLAN_ENABLE            = FALSE
 !include Silicon/Rockchip/Rockchip.dsc.inc
 !include MdePkg/MdeLibs.dsc.inc
+!include SimpleInit.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -243,7 +244,7 @@
   #
   # Make VariableRuntimeDxe work at emulated non-volatile variable mode.
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+  # gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
   # ACPI Enable
   gRK3588TokenSpaceGuid.AcpiEnable|TRUE

@@ -23,9 +23,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  Platform/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RK3588/RK3588.dec
-  Platform/Radxa/ROCK5B/ROCK5B.dec
 
 [LibraryClasses]
   ArmLib
@@ -34,6 +32,7 @@
   MemoryAllocationLib
   PcdLib
   PrintLib
+  SdramLib
 
 [Sources.common]
   Rk3588.c
@@ -52,7 +51,6 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   gArmTokenSpaceGuid.PcdFdSize
-  gRK3588TokenSpaceGuid.PcdTotalMemorySize
   
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate

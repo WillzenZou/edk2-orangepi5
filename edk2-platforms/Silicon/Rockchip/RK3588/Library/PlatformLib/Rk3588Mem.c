@@ -15,6 +15,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/Rk3588Mem.h>
+#include <Library/SdramLib.h>
 
 UINT64 mSystemMemoryBase = FixedPcdGet64 (PcdSystemMemoryBase);
 STATIC UINT64 mSystemMemorySize = FixedPcdGet64 (PcdSystemMemorySize);
@@ -45,8 +46,8 @@ ArmPlatformGetVirtualMemoryMap (
   UINTN                         Index = 0;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
 
-  mSystemMemorySize = PcdGet64 (PcdTotalMemorySize);
-  DEBUG ((DEBUG_INFO, "RAM: 0x%ll08X (FIXED Size 0x%ll08X)\n", mSystemMemoryBase, mSystemMemorySize));
+  mSystemMemorySize = SdramGetMemorySize ();
+  DEBUG ((DEBUG_INFO, "RAM: 0x%ll08X (Size 0x%ll08X)\n", mSystemMemoryBase, mSystemMemorySize));
 
   VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)AllocatePages
                        (EFI_SIZE_TO_PAGES (sizeof (ARM_MEMORY_REGION_DESCRIPTOR) *
@@ -112,6 +113,24 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
   VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
   VirtualMemoryInfo[Index++].Name           = L"SCMI";
+
+  if (mSystemMemoryBase + mSystemMemorySize > 0x3fc000000UL) {
+    // Bad memory range 1
+    VirtualMemoryTable[Index].PhysicalBase    = 0x3fc000000;
+    VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+    VirtualMemoryTable[Index].Length          = 0x500000;
+    VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+    VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
+    VirtualMemoryInfo[Index++].Name           = L"BAD1";
+
+    // Bad memory range 2
+    VirtualMemoryTable[Index].PhysicalBase    = 0x3fff00000;
+    VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+    VirtualMemoryTable[Index].Length          = 0x100000;
+    VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+    VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
+    VirtualMemoryInfo[Index++].Name           = L"BAD2";
+  }
   
   // Firmware Volume
   // VirtualMemoryTable[Index].PhysicalBase    = FixedPcdGet64 (PcdFdBaseAddress);

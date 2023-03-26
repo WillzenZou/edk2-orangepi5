@@ -1,0 +1,56 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        PLATFORM: [rock-5b, orangepi-5] # rk3588-evb is currently failing
+        CONFIGURATION: [Debug, Release]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Submodule init
+        shell: bash
+        run: git submodule update --init --recursive
+        
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt-get install -y \
+          acpica-tools \
+          binutils-aarch64-linux-gnu \
+          build-essential \
+          device-tree-compiler \
+          gettext \
+          git \
+          gcc-aarch64-linux-gnu \
+          libc6-dev-arm64-cross \
+          python3 \
+          python3-pyelftools
+          
+      - name: Get version tag
+        id: get_version_tag
+        shell: bash
+        run: echo "version=$(git describe --tags --always)" >> $GITHUB_OUTPUT
+        
+      - name: Build platform
+        shell: bash
+        run: |  
+         ./build.sh --device ${{matrix.PLATFORM}} --release ${{matrix.CONFIGURATION}}
+          mv RK3588_NOR_FLASH.img ${{matrix.PLATFORM}}_UEFI_${{matrix.CONFIGURATION}}_${{steps.get_version_tag.outputs.version}}.img
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{matrix.PLATFORM}} UEFI ${{matrix.CONFIGURATION}} image
+          path: ./*.img
+          if-no-files-found: error

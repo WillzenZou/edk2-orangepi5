@@ -43,6 +43,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmPlatformLib|Silicon/Rockchip/RK3588/Library/PlatformLib/PlatformLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   CruLib|Silicon/Rockchip/Library/CruLib/CruLib.inf
 
@@ -89,7 +90,6 @@
   #
   # Custom libraries
   #
-  ArmPlatformLib|Platform/Radxa/ROCK5B/Library/PlatformLib/PlatformLib.inf
   RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
   ResetSystemLib|Platform/Radxa/ROCK5B/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Platform/Radxa/ROCK5B/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
@@ -132,7 +132,6 @@
   # System Memory (1GB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x00000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
-  gRK3588TokenSpaceGuid.PcdTotalMemorySize|0x200000000
   
   # RK3588 CPU profile
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
@@ -261,7 +260,7 @@
   #
   # ComboPhy
   #
-  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_SATA), $(CP_PCIE), $(CP_USB3) }
+  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_PCIE), $(CP_PCIE), $(CP_USB3) }
 
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
@@ -423,7 +422,7 @@
   #EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   #Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-  #Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
@@ -454,7 +453,7 @@
   #
   # USB Ohci Controller
   #
-  #Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+  Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
 
   #
   # USB Ehci Controller

@@ -270,6 +270,7 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
   INF FatPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
@@ -330,7 +331,9 @@ READ_LOCK_STATUS   = TRUE
   #
   # Simple Init GUI
   #
+!if $(ENABLE_SIMPLE_INIT)
   INF src/main/SimpleInitMain.inf
+!endif
 
 [FV.BL33_AP_UEFI]
 FvAlignment        = 8

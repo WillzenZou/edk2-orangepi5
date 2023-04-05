@@ -39,7 +39,10 @@
   DEFINE NETWORK_VLAN_ENABLE            = FALSE
 !include Silicon/Rockchip/Rockchip.dsc.inc
 !include MdePkg/MdeLibs.dsc.inc
-!include SimpleInit.inc
+
+!if $(ENABLE_SIMPLE_INIT)
+  !include SimpleInit.inc
+!endif
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -86,24 +89,26 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
+  # OTP Library
+  OtpLib|Silicon/Rockchip/RK3588/Library/OtpLib/OtpLib.inf
 
   #
   # Custom libraries
   #
   RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
-  ResetSystemLib|Platform/Radxa/ROCK5B/Library/ResetSystemLib/ResetSystemLib.inf
-  PlatformBootManagerLib|Platform/Radxa/ROCK5B/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  SerialPortLib|Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
-  GpioLib|Platform/Radxa/ROCK5B/Library/GpioLib/GpioLib.inf
+  ResetSystemLib|Silicon/Rockchip/Library/ResetSystemLib/ResetSystemLib.inf
+  PlatformBootManagerLib|Silicon/Rockchip/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  SerialPortLib|Silicon/Hisilicon/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
+  GpioLib|Silicon/Rockchip/RK3588/Library/GpioLib/GpioLib.inf
   # SCMI Mailbox Transport Layer
-  ArmMtlLib|Platform/Radxa/ROCK5B/Library/RkMtlLib/RkMtlLib.inf
+  ArmMtlLib|Silicon/Rockchip/Library/RkMtlLib/RkMtlLib.inf
 
 [LibraryClasses.common.SEC]
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
-  MemoryInitPeiLib|Platform/Radxa/ROCK5B/Library/MemoryInitPeiLib/MemoryInitPeiLib.inf
+  MemoryInitPeiLib|Silicon/Rockchip/RK3588/Library/MemoryInitPeiLib/MemoryInitPeiLib.inf
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
 
@@ -137,6 +142,13 @@
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
+  # SMBIOS platform config
+  gRockchipTokenSpaceGuid.PcdPlatformName|"Radxa ROCK 5 Model B"
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
+  gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
+  gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.radxa.com/Rock5/hardware/5b"
+  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"TBD"
+
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x51 }
   gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x2 }
@@ -151,6 +163,8 @@
   DEFINE SERIAL_BASE = 0xFEB50000 # UART2
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|$(SERIAL_BASE)
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
+  gHisiTokenSpaceGuid.PcdSerialPortSendDelay|500000
+  gHisiTokenSpaceGuid.PcdUartClkInHz|24000000
 
   ## SPI - SPI2 for test
   gRockchipTokenSpaceGuid.SpiTestBaseAddr|0xFEB20000
@@ -422,7 +436,7 @@
   #EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   #Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-  Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  Silicon/Rockchip/RK3588/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
@@ -447,7 +461,7 @@
   #
   # SMBIOS Support
   #
-  Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  Silicon/Rockchip/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   
   #
@@ -575,7 +589,7 @@
   #
   # Custom Applications and drivers
   #
-  Platform/Radxa/ROCK5B/Applications/maskrom/maskrom.inf
+  Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
 
   # Platform drivers
   Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf

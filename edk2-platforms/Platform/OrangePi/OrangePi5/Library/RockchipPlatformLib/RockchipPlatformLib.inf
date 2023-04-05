@@ -11,6 +11,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RockchipPlatformLib
+  RKPLATLIB_COMMON_DIR           = Silicon/Rockchip/RK3588/Library/RockchipPlatformLibCommon
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -19,7 +20,6 @@
   Platform/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RockchipPkg.dec
-  Platform/OrangePi/OrangePi5/OrangePi5.dec
 
 [LibraryClasses]
   ArmLib
@@ -32,8 +32,8 @@
 
 [Sources.common]
   RockchipPlatformLib.c
-  RK3588CruLib.c
-  RockchipSdhci.c
+  $(RKPLATLIB_COMMON_DIR)/RK3588CruLib.c
+  $(RKPLATLIB_COMMON_DIR)/RockchipSdhci.c
 
 [Sources.AARCH64]
 

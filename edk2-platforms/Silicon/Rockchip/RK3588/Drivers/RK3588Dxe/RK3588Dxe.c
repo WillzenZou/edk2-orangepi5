@@ -48,7 +48,7 @@
 
 STATIC
 EFI_STATUS
-BoardInitSetCpuSpeed (
+SetMaxCpuSpeed (
   VOID
   )
 {
@@ -65,6 +65,7 @@ BoardInitSetCpuSpeed (
   SCMI_CLOCK_RATE        *ClockRate;
   SCMI_CLOCK_RATE_FORMAT ClockRateFormat;
   UINT32                 ClockIds[3]= {SCMI_CLK_CPUL, SCMI_CLK_CPUB01, SCMI_CLK_CPUB23};
+  UINT32                 ClockIndex;
 
   Status = gBS->LocateProtocol (
                   &ClockProtocolGuid,
@@ -84,11 +85,9 @@ BoardInitSetCpuSpeed (
   DEBUG ((DEBUG_ERROR, "SCMI clock management protocol version = %x\n",
     ClockProtocolVersion));
 
-  ClockId = 0;
-
-  for (int i=0 ; i<3; i=i+1 )
+  for (ClockIndex = 0; ClockIndex < ARRAY_SIZE(ClockIds); ClockIndex++)
   {
-    ClockId = ClockIds[i];
+    ClockId = ClockIds[ClockIndex];
     Status = ClockProtocol->GetClockAttributes (
                               ClockProtocol,
                               ClockId,
@@ -153,6 +152,10 @@ BoardInitSetCpuSpeed (
 
     CpuRate = ClockRate[TotalRates - 1].DiscreteRate.Rate;
     FreePool (ClockRate);
+
+    // The maximum discrete rates returned are 63 Hz higher than supported,
+    // causing SCMI to ignore the setting.
+    CpuRate -= CpuRate % 100;
 
     DEBUG ((EFI_D_WARN, "SCMI: %a: New rate is %uHz\n", ClockName, CpuRate));
 
@@ -235,56 +238,6 @@ GmacIomuxInit (
   DEBUG((EFI_D_WARN, "RK3588InitPeripherals: GmacIomuxInit()\n"));
   GmacIomux(0);
 }
-
-static struct regulator_init_data rk806_master[] = {
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK1, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK2, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK3, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK4, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK5, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK6, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK7, 2000000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK8, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_BUCK10, 1100000),
-
-	RK8XX_VOLTAGE_INIT(MASTER_NLDO1, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_NLDO2, 900000),
-	RK8XX_VOLTAGE_INIT(MASTER_NLDO3, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_NLDO4, 750000),
-	RK8XX_VOLTAGE_INIT(MASTER_NLDO5, 850000),
-
-	RK8XX_VOLTAGE_INIT(MASTER_PLDO1, 1800000),
-	RK8XX_VOLTAGE_INIT(MASTER_PLDO2, 1800000),
-	RK8XX_VOLTAGE_INIT(MASTER_PLDO3, 1800000),
-	RK8XX_VOLTAGE_INIT(MASTER_PLDO4, 3300000),
-	RK8XX_VOLTAGE_INIT(MASTER_PLDO5, 1800000),
-	RK8XX_VOLTAGE_INIT(MASTER_PLDO6, 1800000),
-};
-
-static struct regulator_init_data rk806_slaver[] = {
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK1, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK2, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK3, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK4, 3300000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK5, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK6, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK7, 1800000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK8, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_BUCK10, 850000),
-
-	RK8XX_VOLTAGE_INIT(SLAVER_NLDO1, 750000),
-	RK8XX_VOLTAGE_INIT(SLAVER_NLDO2, 850000),
-	RK8XX_VOLTAGE_INIT(SLAVER_NLDO3, 850000),
-	RK8XX_VOLTAGE_INIT(SLAVER_NLDO4, 1200000),
-	RK8XX_VOLTAGE_INIT(SLAVER_NLDO5, 1200000),
-
-	RK8XX_VOLTAGE_INIT(SLAVER_PLDO1, 1800000),
-	RK8XX_VOLTAGE_INIT(SLAVER_PLDO2, 1800000),
-	RK8XX_VOLTAGE_INIT(SLAVER_PLDO3, 1800000),
-	RK8XX_VOLTAGE_INIT(SLAVER_PLDO4, 3300000),
-	RK8XX_VOLTAGE_INIT(SLAVER_PLDO5, 2800000),
-	RK8XX_VOLTAGE_INIT(SLAVER_PLDO6, 1800000),
-};
 
 static UINTN ComPhyReg[3][2] = {
   {0xFEE00000, 0xFD5BC000},
@@ -487,23 +440,19 @@ RK3588InitPeripherals (
   /* Set DETECT_J15_FASTBOOT (GPIO24) pin as GPIO function */
   //MmioWrite32 (IOCG_084_REG, 0);        /* configure GPIO24 as nopull */
   //MmioWrite32 (IOMG_080_REG, 0);        /* configure GPIO24 as GPIO */
-  // RK806Init();
 
-  // for (i = 0; i < ARRAY_SIZE(rk806_master); i++)
-  //   RK806RegulatorInit(rk806_master[i]);
-  // for (i = 0; i < ARRAY_SIZE(rk806_slaver); i++)
-  //   RK806RegulatorInit(rk806_slaver[i]);
+  Rk806Configure();
 
   ComboPhyInit();
 
-  // GmacIomuxInit();
-
+  GmacIomuxInit();
+  
   /* Enable USB PHYs */
   Usb2PhyResume (); 
   UsbDpPhyEnable ();
   
   UsbPortPowerEnable ();
-
+  
   return EFI_SUCCESS;
 }
 
@@ -589,13 +538,15 @@ GetPlatformBootOptionsAndKeys (
   EFI_STATUS                             Status;
   UINTN                                  Size;
 
-  Size = sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * HIKEY_BOOT_OPTION_NUM;
+  *BootCount = 4;
+
+  Size = sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * *BootCount;
   *BootOptions = (EFI_BOOT_MANAGER_LOAD_OPTION *)AllocateZeroPool (Size);
   if (*BootOptions == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory for BootOptions\n"));
     return EFI_OUT_OF_RESOURCES;
   }
-  Size = sizeof (EFI_INPUT_KEY) * HIKEY_BOOT_OPTION_NUM;
+  Size = sizeof (EFI_INPUT_KEY) * *BootCount;
   *BootKeys = (EFI_INPUT_KEY *)AllocateZeroPool (Size);
   if (*BootKeys == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory for BootKeys\n"));
@@ -640,8 +591,6 @@ GetPlatformBootOptionsAndKeys (
   ASSERT_EFI_ERROR (Status);
   (*BootKeys)[3].ScanCode = SCAN_NULL;
   (*BootKeys)[3].UnicodeChar = 'f';
-
-  *BootCount = 4;
 
   return EFI_SUCCESS;
 Error:
@@ -839,11 +788,7 @@ RK3588EntryPoint (
 {
   EFI_STATUS            Status;
 
-  /* Update CPU speed */
-  // looks like the BL31 firmware in rk3588 isn't able to change frequency anymore
-  // You can get current CPU freq with it, and even set a new freq without error
-  // but it won't take effect.
-  // BoardInitSetCpuSpeed();
+  SetMaxCpuSpeed ();
   
   Status = RK3588InitPeripherals ();
   if (EFI_ERROR (Status)) {

@@ -143,7 +143,7 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
   # SMBIOS platform config
-  gRockchipTokenSpaceGuid.PcdPlatformName|"Radxa ROCK 5 Model B"
+  gRockchipTokenSpaceGuid.PcdPlatformName|"ROCK 5 Model B"
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
   gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.radxa.com/Rock5/hardware/5b"
@@ -592,5 +592,5 @@
   Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
 
   # Platform drivers
-  Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf
+  Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 

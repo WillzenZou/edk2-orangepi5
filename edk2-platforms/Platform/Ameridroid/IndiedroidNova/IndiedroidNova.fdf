@@ -43,7 +43,7 @@ NumBlocks     = 0x800
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00200000|0x00500000
+0x00200000|0x00100000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = BL33_AP_UEFI
 
@@ -131,7 +131,7 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  INF RuleOverride = ACPITABLE Platform/Radxa/ROCK5B/AcpiTables/AcpiTables.inf
+  INF RuleOverride = ACPITABLE Platform/Ameridroid/IndiedroidNova/AcpiTables/AcpiTables.inf
 
   #
   # Device tree
@@ -153,7 +153,6 @@ READ_LOCK_STATUS   = TRUE
   INF Silicon/Rockchip/Drivers/I2c/I2cDxe/I2cDxe.inf
   INF MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
   # INF Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
-  INF Silicon/Rockchip/Drivers/I2c/Rk860xRegulatorDxe/Rk860xRegulatorDxe.inf
 
   #
   # Virtual Keyboard
@@ -168,7 +167,7 @@ READ_LOCK_STATUS   = TRUE
   #INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
   INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
-  INF Platform/Radxa/Drivers/LogoDxe/LogoDxe.inf
+  INF Platform/Ameridroid/Drivers/LogoDxe/LogoDxe.inf
 
   INF Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 
@@ -235,14 +234,14 @@ READ_LOCK_STATUS   = TRUE
 
 
   #PCIe
-  INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
+  #INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
 
   # Required by PCI
   INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
 
   # PCI Support
   INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-  INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  #INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   #INF MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
 
@@ -271,7 +270,6 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
   INF FatPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
@@ -280,6 +278,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # INF Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   INF Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
+  # sdcard is dwemmc, sdhci is for eMMC.
   INF Silicon/Rockchip/RK3588/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   
   # Needs to be disabled if booting from eMMC
@@ -328,13 +327,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF MdeModulePkg/Application/UiApp/UiApp.inf
-
-  #
-  # Simple Init GUI
-  #
-!if $(ENABLE_SIMPLE_INIT)
-  INF src/main/SimpleInitMain.inf
-!endif
 
 [FV.BL33_AP_UEFI]
 FvAlignment        = 8

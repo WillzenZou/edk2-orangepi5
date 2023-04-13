@@ -11,7 +11,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = ROCK5B
+  PLATFORM_NAME                  = IndiedroidNova
   PLATFORM_GUID                  = d080df36-45e7-11ec-9726-f42a7dcb925d
   PLATFORM_VERSION               = 0.2
   DSC_SPECIFICATION              = 0x00010019
@@ -19,7 +19,7 @@
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Platform/Radxa/ROCK5B/ROCK5B.fdf
+  FLASH_DEFINITION               = Platform/Ameridroid/IndiedroidNova/IndiedroidNova.fdf
 
   DEFINE CONFIG_NO_DEBUGLIB      = TRUE
 
@@ -39,10 +39,6 @@
   DEFINE NETWORK_VLAN_ENABLE            = FALSE
 !include Silicon/Rockchip/Rockchip.dsc.inc
 !include MdePkg/MdeLibs.dsc.inc
-
-!if $(ENABLE_SIMPLE_INIT)
-  !include SimpleInit.inc
-!endif
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -71,8 +67,8 @@
 
   # PCIe
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciHostBridgeLib|Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-  PciExpressLib|Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
+  #PciHostBridgeLib|Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  #PciExpressLib|Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
 
 
@@ -95,7 +91,7 @@
   #
   # Custom libraries
   #
-  RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
+  RockchipPlatformLib|Platform/Ameridroid/IndiedroidNova/Library/RockchipPlatformLib/RockchipPlatformLib.inf
   ResetSystemLib|Silicon/Rockchip/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Silicon/Rockchip/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   SerialPortLib|Silicon/Hisilicon/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
@@ -113,7 +109,7 @@
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
-  RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
+  RockchipPlatformLib|Platform/Ameridroid/IndiedroidNova/Library/RockchipPlatformLib/RockchipPlatformLib.inf
 
 [BuildOptions]
   GCC:*_*_*_PLATFORM_FLAGS = -I$(WORKSPACE)/Silicon/Rockchip/RK3588/Include -I$(WORKSPACE)/Platform/Rockchip/RK3588/Include -I$(WORKSPACE)/Silicon/Rockchip/Include
@@ -137,31 +133,28 @@
   # System Memory (1GB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x00000000
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
+  gRK3588TokenSpaceGuid.PcdTotalMemorySize|0x200000000
   
   # RK3588 CPU profile
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
   # SMBIOS platform config
-  gRockchipTokenSpaceGuid.PcdPlatformName|"ROCK 5 Model B"
-  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
-  gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
-  gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.radxa.com/Rock5/hardware/5b"
+  gRockchipTokenSpaceGuid.PcdPlatformName|"Indiedroid Nova"
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"ameriDroid"
+  gRockchipTokenSpaceGuid.PcdFamilyName|"Indiedroid"
+  gRockchipTokenSpaceGuid.PcdProductUrl|"http://indiedroid.us"
   gRockchipTokenSpaceGuid.PcdMemoryVendorName|"TBD"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0 }
-  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x0 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x51 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x2 }
+  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x2 }
   gRockchipTokenSpaceGuid.PcdI2cClockFrequency|198000000
   gRockchipTokenSpaceGuid.PcdI2cBaudRate|100000
   gRockchipTokenSpaceGuid.PcdI2cBusCount|1
   gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x51 } #/* RTCYM8563TS 0x51@bus2 */
   gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x2 }
-  gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
-  gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
-  gRockchipTokenSpaceGuid.PcdRk860xRegulatorMinVoltages|{ UINT32(550000), UINT32(550000) }
-  gRockchipTokenSpaceGuid.PcdRk860xRegulatorMaxVoltages|{ UINT32(1050000), UINT32(1050000) }
 
   ## UART2 - Serial Terminal
   DEFINE SERIAL_BASE = 0xFEB50000 # UART2
@@ -255,7 +248,7 @@
   #
   # Make VariableRuntimeDxe work at emulated non-volatile variable mode.
   #
-  # gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
   # ACPI Enable
   gRK3588TokenSpaceGuid.AcpiEnable|TRUE
@@ -272,7 +265,7 @@
   #
   # ComboPhy
   #
-  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_PCIE), $(CP_PCIE), $(CP_USB3) }
+  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_SATA), $(CP_PCIE), $(CP_USB3) }
 
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
@@ -360,13 +353,13 @@
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
   #PCIe
-  Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
-  Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-  Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
+  #Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
+  #Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  #Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
 
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  #MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   #MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
@@ -390,7 +383,7 @@
   Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
-  Platform/Radxa/Drivers/LogoDxe/LogoDxe.inf
+  Platform/Ameridroid/Drivers/LogoDxe/LogoDxe.inf
 
   #
   # SCMI Driver
@@ -402,7 +395,7 @@
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  Platform/Radxa/ROCK5B/AcpiTables/AcpiTables.inf
+  Platform/Ameridroid/IndiedroidNova/AcpiTables/AcpiTables.inf
 
   #
   # Device tree
@@ -427,7 +420,6 @@
   MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
   Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
   Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
-  Silicon/Rockchip/Drivers/I2c/Rk860xRegulatorDxe/Rk860xRegulatorDxe.inf
 
   #
   # MMC/SD
@@ -435,6 +427,7 @@
   #EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   #Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
+  # sdcard is dwemmc, sdhci is for eMMC.
   Silicon/Rockchip/RK3588/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
@@ -538,7 +531,6 @@
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
 
   #

@@ -186,8 +186,9 @@ SetMaxCpuSpeed (
 STATIC
 VOID
 EFIAPI
-ConfigureRk860xRegulator (
-  VOID
+OnRk860xRegulatorRegistrationEvent (
+  IN  EFI_EVENT   Event,
+  IN  VOID        *Context
   )
 {
   EFI_STATUS                  Status;
@@ -203,8 +204,13 @@ ConfigureRk860xRegulator (
                                     &NumRegulators,
                                     &HandleBuffer);
   if (EFI_ERROR(Status)) {
+    if (Status != EFI_NOT_FOUND) {
+        DEBUG((DEBUG_WARN, "Couldn't locate gRk860xRegulatorProtocolGuid. Status=%r\n", Status));
+    }
     return;
   }
+
+  gBS->CloseEvent (Event);
 
   DEBUG((EFI_D_WARN, "%u regulators found:\n", NumRegulators));
 
@@ -217,7 +223,8 @@ ConfigureRk860xRegulator (
                                 EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, " Failed to open protocol for reg %d\n", Index));
+      DEBUG((DEBUG_ERROR, " Failed to open protocol for reg %d. Status=%r\n", Index));
+      return;
     }
 
     DEBUG((EFI_D_WARN," 0x%x on I2C bus %d\n", 
@@ -231,7 +238,7 @@ ConfigureRk860xRegulator (
 
     Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%lx\n", Status));
+      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
     DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
@@ -241,23 +248,23 @@ ConfigureRk860xRegulator (
     DEBUG((EFI_D_WARN,"   Setting voltage to preferred max: %d mV\n", Voltage));
     Status = Rk860xRegulator->SetVoltage (Rk860xRegulator, Voltage, FALSE);
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to set voltage. Status=%lx\n", Status));
+      DEBUG((DEBUG_ERROR, "   Failed to set voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
 
     Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%lx\n", Status));
+      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
     DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
-  }
 
 CloseProtocol:
-  gBS->CloseProtocol (HandleBuffer[Index],
-                      &gRk860xRegulatorProtocolGuid,
-                      gImageHandle,
-                      NULL);
+    gBS->CloseProtocol (HandleBuffer[Index],
+                        &gRk860xRegulatorProtocolGuid,
+                        gImageHandle,
+                        NULL);
+  }
 }
 
 STATIC
@@ -860,8 +867,15 @@ RK3588EntryPoint (
   )
 {
   EFI_STATUS            Status;
+  VOID                  *Rk860xRegulatorRegistration;
 
-  ConfigureRk860xRegulator ();
+  /* Configure regulators when/if the protocol gets installed */
+  EfiCreateProtocolNotifyEvent (&gRk860xRegulatorProtocolGuid,
+                                TPL_CALLBACK,
+                                OnRk860xRegulatorRegistrationEvent,
+                                NULL,
+                                &Rk860xRegulatorRegistration);
+
   SetMaxCpuSpeed ();
   
   Status = RK3588InitPeripherals ();
